@@ -1,0 +1,11 @@
+openapi: 3.1.0
+
+info:
+  title: BharatAPI
+  version: 1.0.0
+  description: India-first developer APIs.
+
+servers:
+  - url: https://api.bharatapi.dev
+
+paths: {}
