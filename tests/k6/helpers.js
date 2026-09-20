@@ -25,3 +25,10 @@ export function validatePincodeResponse(res) {
     "districts exist": (r) => Array.isArray(r.json("data.districts")),
   });
 }
+
+export function logUnexpectedResponse(res) {
+  if (res.status !== 200) {
+    console.log(`Status: ${res.status}`);
+    console.log(res.body.substring(0, 200));
+  }
+}
