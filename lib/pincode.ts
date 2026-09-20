@@ -22,3 +22,4 @@ export function getPincode(code: string) {
 export function hasPincode(code: string) {
     return code in pincodeData;
 }
+

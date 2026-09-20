@@ -3,6 +3,7 @@ import { NextRequest } from "next/server";
 import { success, failure } from "@/lib/api-response";
 import { getPincode } from "@/lib/pincode";
 import { pincodeSchema } from "@/lib/validation";
+import { CACHE } from "@/lib/cache";
 
 export const runtime = "nodejs";
 export const dynamic = "force-static";
@@ -44,7 +45,7 @@ export async function GET(
         },
         200,
         {
-            "Cache-Control": "public, s-maxage=86400, stale-while-revalidate=604800",
+            "Cache-Control": CACHE.STATIC_API,
         }
     );
 }

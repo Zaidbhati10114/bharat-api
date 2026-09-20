@@ -4,6 +4,109 @@
 
 @custom-variant dark (&:is(.dark *));
 
+
+/* ---------- BharatAPI Documentation Typeset ---------- */
+
+.typeset {
+  --flow: 1.75rem;
+  max-width: 760px;
+}
+
+.typeset > * + * {
+  margin-top: var(--flow);
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+/* Headings */
+
+.typeset h1 {
+  font-size: clamp(2.5rem, 5vw, 3.75rem);
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: -0.04em;
+  margin-top: 0;
+}
+
+.typeset h2 {
+  font-size: clamp(1.75rem, 3vw, 2rem);
+  font-weight: 700;
+  line-height: 1.2;
+  letter-spacing: -0.02em;
+  margin-top: 5rem;
+}
+
+.typeset h3 {
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin-top: 2.5rem;
+}
+
+/* Body */
+
+.typeset p {
+  color: hsl(var(--muted-foreground));
+  line-height: 1.9;
+  font-size: 1.05rem;
+}
+
+/* Links */
+
+.typeset a {
+  color: hsl(var(--foreground));
+  text-decoration: none;
+}
+
+.typeset a:hover {
+  color: rgb(249 115 22);
+}
+
+/* Lists */
+
+.typeset ul,
+.typeset ol {
+  padding-left: 1.5rem;
+}
+
+.typeset li {
+  margin: 0.75rem 0;
+  line-height: 1.8;
+}
+
+/* Tables */
+
+.typeset table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.typeset th {
+  text-align: left;
+  font-weight: 600;
+}
+
+.typeset th,
+.typeset td {
+  padding: 1rem 1.25rem;
+}
+
+/* Code */
+
+.typeset code {
+  border-radius: 0.35rem;
+  background: hsl(var(--muted));
+  padding: 0.15rem 0.35rem;
+  font-size: 0.9em;
+}
+
+.typeset pre {
+  overflow-x: auto;
+  border-radius: 1rem;
+  padding: 1.25rem;
+}
+
 html,
 html {
   scroll-behavior: smooth;
