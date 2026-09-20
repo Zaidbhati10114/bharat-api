@@ -2,11 +2,13 @@ import Link from "next/link";
 import { Container } from "@/components/shared/container";
 import { Navbar } from "@/components/landing/navbar";
 import { Footer } from "@/components/landing/footer";
+import { getInfo } from "@/lib/openapi";
 
 export default function DocsPage() {
+  const info = getInfo();
   return (
     <>
-      <Navbar />
+      {/* <Navbar />
 
       <main className="py-20">
         <Container>
@@ -34,7 +36,12 @@ export default function DocsPage() {
         </Container>
       </main>
 
-      <Footer />
+      <Footer /> */}
+      <div className="p-10">
+        <h1>{info.title}</h1>
+        <p>{info.version}</p>
+        <p>{info.description}</p>
+      </div>
     </>
   );
 }

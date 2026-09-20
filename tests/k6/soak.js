@@ -1,0 +1,27 @@
+import http from "k6/http";
+import { check } from "k6";
+
+import { BASE_URL, THRESHOLDS, STAGES } from "./config.js";
+import { validateApiResponse, validatePincodeResponse } from "./helpers.js";
+
+export const options = {
+  scenarios: {
+    soak_test: {
+      executor: "ramping-vus",
+      stages: STAGES.soak,
+      gracefulRampDown: "20s",
+    },
+  },
+  thresholds: THRESHOLDS,
+};
+
+export default function () {
+  const res = http.get(`${BASE_URL}/api/v1/pincode/421201`);
+
+  validateApiResponse(res);
+  validatePincodeResponse(res);
+
+  check(res, {
+    "response under 1s": (r) => r.timings.duration < 1000,
+  });
+}

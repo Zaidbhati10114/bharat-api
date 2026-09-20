@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { Check, Copy } from "lucide-react";
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
 import {
@@ -43,14 +43,24 @@ const syntaxMap: Record<ExampleLanguage, string> = {
 export function CodeTabs({ examples }: CodeTabsProps) {
   const { resolvedTheme } = useTheme();
 
-  const languages = Object.entries(examples) as [ExampleLanguage, string][];
+  const languages = useMemo(
+    () =>
+      (Object.entries(examples) as [ExampleLanguage, string][]).filter(
+        ([, code]) => !!code,
+      ),
+    [examples],
+  );
 
-  const [active, setActive] = useState<ExampleLanguage>(languages[0][0]);
+  const [active, setActive] = useState<ExampleLanguage>(
+    languages[0]?.[0] ?? "curl",
+  );
   const [copied, setCopied] = useState(false);
 
   const code = examples[active] ?? "";
 
   async function handleCopy() {
+    if (!code) return;
+
     await navigator.clipboard.writeText(code);
     setCopied(true);
     setTimeout(() => setCopied(false), 1500);
@@ -79,6 +89,7 @@ export function CodeTabs({ examples }: CodeTabsProps) {
         <button
           onClick={handleCopy}
           className="hover:bg-background rounded-lg p-2 transition"
+          aria-label="Copy code"
         >
           {copied ? (
             <Check className="size-4 text-green-500" />

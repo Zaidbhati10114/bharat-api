@@ -2,11 +2,7 @@ import http from "k6/http";
 import { check } from "k6";
 
 import { BASE_URL, THRESHOLDS } from "./config.js";
-import {
-  validateApiResponse,
-  validatePincodeResponse,
-  logUnexpectedResponse,
-} from "./helpers.js";
+import { validateApiResponse, validatePincodeResponse } from "./helpers.js";
 
 export const options = {
   scenarios: {
@@ -27,8 +23,6 @@ export default function () {
 
   validateApiResponse(res);
   validatePincodeResponse(res);
-
-  logUnexpectedResponse(res);
 
   check(res, {
     "response under 1s": (r) => r.timings.duration < 1000,

@@ -6,6 +6,8 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
+    "openapi:lint": "redocly lint openapi.yaml",
+    "openapi:bundle": "redocly bundle openapi.yaml -o public/openapi.json",
     "lint": "eslint"
   },
   "dependencies": {
@@ -22,9 +24,11 @@
     "react-dom": "19.2.8",
     "react-syntax-highlighter": "^16.1.1",
     "shadcn": "^4.21.0",
+    "yaml": "^2.9.1",
     "zod": "^4.6.5"
   },
   "devDependencies": {
+    "@redocly/cli": "^2.53.3",
     "@tailwindcss/postcss": "^4.3.3",
     "@types/node": "^20",
     "@types/react": "^19",
