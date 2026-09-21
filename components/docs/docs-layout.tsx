@@ -1,8 +1,15 @@
 import { ReactNode } from "react";
+
 import { DocsSidebar } from "./docs-sidebar";
 import { TableOfContents } from "./table-of-contents";
+import { ApiDoc } from "@/lib/docs/types";
 
-export function DocsLayout({ children }: { children: ReactNode }) {
+interface DocsLayoutProps {
+  doc: ApiDoc;
+  children: ReactNode;
+}
+
+export function DocsLayout({ doc, children }: DocsLayoutProps) {
   return (
     <div className="pt-8 pb-20">
       <div className="mx-auto max-w-[1440px] px-6">
@@ -10,7 +17,10 @@ export function DocsLayout({ children }: { children: ReactNode }) {
           {/* Left Sidebar */}
           <aside className="hidden lg:block">
             <div className="sticky top-28 border-r pr-6">
-              <DocsSidebar title="Pincode API" />
+              <DocsSidebar
+                title={doc.title.toUpperCase()}
+                sections={doc.sections}
+              />
             </div>
           </aside>
 
@@ -20,7 +30,7 @@ export function DocsLayout({ children }: { children: ReactNode }) {
           {/* Right TOC */}
           <aside className="hidden xl:block">
             <div className="sticky top-28">
-              <TableOfContents />
+              <TableOfContents sections={doc.sections} />
             </div>
           </aside>
         </div>

@@ -5,19 +5,15 @@ import Link from "next/link";
 import { cn } from "@/lib/utils";
 import { useActiveHeading } from "@/hooks/use-active-heading";
 
-const headings = [
-  { id: "overview", title: "Overview" },
-  { id: "endpoint", title: "Lookup Endpoint" },
-  { id: "response", title: "Example Response" },
-  {
-    id: "playground",
-    title: "Live Playground",
-  },
-  { id: "errors", title: "Errors" },
-];
+interface TableOfContentsProps {
+  sections: {
+    id: string;
+    title: string;
+  }[];
+}
 
-export function TableOfContents() {
-  const active = useActiveHeading(headings.map((h) => h.id));
+export function TableOfContents({ sections }: TableOfContentsProps) {
+  const active = useActiveHeading(sections.map((section) => section.id));
 
   return (
     <div className="space-y-5">
@@ -26,18 +22,18 @@ export function TableOfContents() {
       </p>
 
       <nav className="space-y-1">
-        {headings.map((heading) => (
+        {sections.map((section) => (
           <Link
-            key={heading.id}
-            href={`#${heading.id}`}
+            key={section.id}
+            href={`#${section.id}`}
             className={cn(
               "block border-l-2 py-1 pl-4 text-sm transition-all duration-200",
-              active === heading.id
+              active === section.id
                 ? "text-foreground border-orange-500 font-medium"
                 : "text-muted-foreground hover:border-muted-foreground/40 hover:text-foreground border-transparent",
             )}
           >
-            {heading.title}
+            {section.title}
           </Link>
         ))}
       </nav>

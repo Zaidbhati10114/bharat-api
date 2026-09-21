@@ -45,33 +45,30 @@ export function getPincodeDoc(): ApiDoc {
     return {
         ...pincodeDoc,
 
-        title: endpoint.get.summary ?? pincodeDoc.title,
+        sections: pincodeDoc.sections,
+        metadata: pincodeDoc.metadata,
 
-        description:
-            endpoint.get.description ?? pincodeDoc.description,
+        title: endpoint.get.summary ?? pincodeDoc.title,
+        description: endpoint.get.description ?? pincodeDoc.description,
 
         endpoint: {
             method: "GET",
             path: PATH,
             description:
-                endpoint.get.description ??
-                pincodeDoc.endpoint.description,
+                endpoint.get.description ?? pincodeDoc.endpoint.description,
         },
 
         examples,
 
         exampleResponse: JSON.stringify(
-            getExample(PATH) ??
-            JSON.parse(pincodeDoc.exampleResponse),
+            getExample(PATH) ?? JSON.parse(pincodeDoc.exampleResponse),
             null,
             2
         ),
 
         errors: getErrors(PATH).map((error) => ({
             status: error.status,
-            code:
-                error.example?.error?.code ??
-                `HTTP_${error.status}`,
+            code: error.example?.error?.code ?? `HTTP_${error.status}`,
             description: error.description,
         })),
     };

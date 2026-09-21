@@ -1,8 +1,19 @@
+import metadata from "@/data/pincode/metadata.json";
 import { mockPincodeData } from "@/components/landing/mock-pinocode";
 import { ApiDoc } from "./types";
-import metadata from "@/data/pincode/metadata.json";
+
 export const pincodeDoc: ApiDoc = {
     title: "Pincode API",
+
+    sections: [
+        { id: "overview", title: "Overview", icon: "map-pin" },
+        { id: "endpoint", title: "Endpoint", icon: "code" },
+        { id: "playground", title: "Playground", icon: "play" },
+        { id: "openapi", title: "OpenAPI", icon: "book" },
+        { id: "response", title: "Example Response", icon: "package" },
+        { id: "errors", title: "Errors", icon: "circle-alert" },
+    ],
+
     metadata: {
         ...metadata,
         recordCount: Object.keys(mockPincodeData).length,
@@ -13,7 +24,7 @@ export const pincodeDoc: ApiDoc = {
 
     endpoint: {
         method: "GET",
-        path: "/api/v1/pincode/:code",
+        path: "/api/v1/pincode/{code}",
         description:
             "Retrieve location details for any valid 6-digit Indian PIN code.",
     },
@@ -28,8 +39,6 @@ export const pincodeDoc: ApiDoc = {
 const data = await res.json();
 
 console.log(data);`,
-
-
 
         python: `import requests
 

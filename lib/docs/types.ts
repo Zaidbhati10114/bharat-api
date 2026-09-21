@@ -1,15 +1,8 @@
-export type HttpMethod =
-    | "GET"
-    | "POST"
-    | "PUT"
-    | "PATCH"
-    | "DELETE";
-
 export type ExampleLanguage =
     | "curl"
     | "javascript"
-    | "python"
     | "typescript"
+    | "python"
     | "go"
     | "java"
     | "csharp"
@@ -17,12 +10,30 @@ export type ExampleLanguage =
     | "ruby"
     | "swift";
 
+export interface DocSection {
+    id: string;
+    title: string;
+    icon?: string;
+}
+export interface ApiMetadata {
+    recordCount: number;
+    lastUpdated: string;
+    refreshCycle: string;
+    version: string;
+    source: string;
+    cache: string;
+}
+
 export interface ApiDoc {
     title: string;
     description: string;
 
+    sections: DocSection[];
+
+    metadata: ApiMetadata;
+
     endpoint: {
-        method: HttpMethod;
+        method: string;
         path: string;
         description: string;
     };
@@ -36,13 +47,4 @@ export interface ApiDoc {
         code: string;
         description: string;
     }[];
-
-    metadata: {
-        version: string;
-        lastUpdated: string;
-        recordCount: number;
-        source: string;
-        cache: string;
-        refreshCycle: string;
-    };
 }

@@ -6,7 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { ApiDoc } from "@/lib/docs/types";
 import { ApiPlayground } from "./api-playground";
 import { DatasetMetadata } from "./dataset-metadata";
-
+import { OpenApiReference } from "./openapi-reference";
 interface DocsPageProps {
   doc: ApiDoc;
 }
@@ -15,7 +15,7 @@ export function DocsPage({ doc }: DocsPageProps) {
   return (
     <article className="typeset">
       {/* Hero */}
-      <section id="overview" className="space-y-10">
+      <section id="overview" className="scroll-mt-40 space-y-10">
         <DocsBreadcrumbs title={doc.title} />
 
         <div className="space-y-8">
@@ -46,7 +46,7 @@ export function DocsPage({ doc }: DocsPageProps) {
       </section>
 
       {/* Endpoint */}
-      <section id="endpoint" className="space-y-8">
+      <section id="endpoint" className="scroll-mt-40 space-y-8">
         <div className="space-y-4">
           <h2 className="text-3xl font-bold tracking-tight">Lookup Endpoint</h2>
 
@@ -60,7 +60,7 @@ export function DocsPage({ doc }: DocsPageProps) {
       </section>
 
       {/* Live */}
-      <section id="playground" className="space-y-8 pt-20">
+      <section id="playground" className="scroll-mt-40 space-y-8">
         <div className="space-y-4">
           <h2>API Explorer</h2>
 
@@ -79,8 +79,13 @@ export function DocsPage({ doc }: DocsPageProps) {
         />
       </section>
 
+      {/* OpenAPI */}
+      <section id="openapi" className="scroll-mt-40 space-y-8">
+        <OpenApiReference />
+      </section>
+
       {/* Response */}
-      <section id="response" className="space-y-8">
+      <section id="response" className="scroll-mt-40 space-y-8">
         <div className="space-y-4">
           <h2 className="text-3xl font-bold tracking-tight">
             Example Response
@@ -96,7 +101,7 @@ export function DocsPage({ doc }: DocsPageProps) {
       </section>
 
       {/* Errors */}
-      <section id="errors" className="space-y-8">
+      <section id="errors" className="scroll-mt-40 space-y-8">
         <div className="space-y-4">
           <h2 className="text-3xl font-bold tracking-tight">Error Codes</h2>
 
@@ -135,7 +140,7 @@ export function DocsPage({ doc }: DocsPageProps) {
         </div>
       </section>
       {/* Dataset */}
-      <section id="dataset" className="space-y-8">
+      <section id="dataset" className="scroll-mt-40 space-y-8">
         <DatasetMetadata metadata={doc.metadata} />
       </section>
 

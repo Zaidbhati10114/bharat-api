@@ -63,30 +63,33 @@ export function Navbar() {
             </Link>
 
             {/* Desktop Navigation */}
+            {/* Desktop Navigation */}
             <nav className="hidden items-center gap-8 md:flex">
-              {navItems.map((item) => (
-                <Link
-                  key={item.label}
-                  href={item.href}
-                  className={cn(
-                    "relative text-sm font-medium transition",
-                    pathname.startsWith(item.href)
-                      ? "text-foreground"
-                      : "text-muted-foreground hover:text-foreground",
-                  )}
-                >
-                  {item.label}
+              {navItems.map((item) => {
+                const isActive = pathname.startsWith(item.href);
 
-                  <span
+                return (
+                  <Link
+                    key={item.label}
+                    href={item.href}
                     className={cn(
-                      "absolute -bottom-1 left-0 h-px bg-orange-500 transition-all duration-300",
-                      pathname.startsWith(item.href)
-                        ? "w-full"
-                        : "w-0 group-hover:w-full",
+                      "group relative text-sm font-medium transition-colors duration-200",
+                      isActive
+                        ? "text-foreground"
+                        : "text-muted-foreground hover:text-foreground",
                     )}
-                  />
-                </Link>
-              ))}
+                  >
+                    {item.label}
+
+                    <span
+                      className={cn(
+                        "absolute -bottom-1 left-0 h-0.5 rounded-full bg-orange-500 transition-all duration-300 ease-out",
+                        isActive ? "w-full" : "w-0 group-hover:w-full",
+                      )}
+                    />
+                  </Link>
+                );
+              })}
             </nav>
 
             {/* Right Actions */}

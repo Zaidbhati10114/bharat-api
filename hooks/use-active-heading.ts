@@ -3,26 +3,38 @@
 import { useEffect, useState } from "react";
 
 export function useActiveHeading(ids: string[]) {
-    const [active, setActive] = useState(ids[0]);
+    const [active, setActive] = useState(() => {
+        if (typeof window === "undefined") return ids[0];
+        return window.location.hash.replace("#", "") || ids[0];
+    });
 
     useEffect(() => {
+        const updateFromHash = () => {
+            const hash = window.location.hash.replace("#", "");
+            if (hash && ids.includes(hash)) {
+                setActive(hash);
+            }
+        };
+
+        window.addEventListener("hashchange", updateFromHash);
+
         const observer = new IntersectionObserver(
             (entries) => {
                 const visible = entries
-                    .filter((e) => e.isIntersecting)
+                    .filter((entry) => entry.isIntersecting)
                     .sort(
                         (a, b) =>
-                            b.intersectionRatio - a.intersectionRatio ||
-                            a.boundingClientRect.top - b.boundingClientRect.top
+                            (a.target as HTMLElement).offsetTop -
+                            (b.target as HTMLElement).offsetTop
                     );
 
-                if (visible[0]) {
+                if (visible.length) {
                     setActive(visible[0].target.id);
                 }
             },
             {
-                rootMargin: "-20% 0px -60% 0px",
-                threshold: [0.1, 0.3, 0.6],
+                rootMargin: "-120px 0px -60% 0px",
+                threshold: 0.15,
             }
         );
 
@@ -31,7 +43,10 @@ export function useActiveHeading(ids: string[]) {
             if (el) observer.observe(el);
         });
 
-        return () => observer.disconnect();
+        return () => {
+            window.removeEventListener("hashchange", updateFromHash);
+            observer.disconnect();
+        };
     }, [ids]);
 
     return active;

@@ -13,10 +13,16 @@ servers:
 
 # Pincode API is currently public.
 security: []
+tags:
+  - name: Pincode API
+    description: Fast Indian PIN code lookup powered by BharatAPI.
+
 
 paths:
   /api/v1/pincode/{code}:
     get:
+      tags:
+        - Pincode API
       summary: Indian Pincode API
       description: Retrieve location details for any valid 6-digit Indian PIN code.
       operationId: getPincode
