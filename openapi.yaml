@@ -3,9 +3,111 @@ openapi: 3.1.0
 info:
   title: BharatAPI
   version: 1.0.0
-  description: India-first developer APIs.
+  description: India-first developer APIs built with official and open datasets.
+  license:
+    name: MIT
+    identifier: MIT
 
 servers:
   - url: https://api.bharatapi.dev
 
-paths: {}
+# Pincode API is currently public.
+security: []
+tags:
+  - name: Pincode API
+    description: Fast Indian PIN code lookup powered by BharatAPI.
+
+
+paths:
+  /api/v1/pincode/{code}:
+    get:
+      tags:
+        - Pincode API
+      summary: Indian Pincode API
+      description: Retrieve location details for any valid 6-digit Indian PIN code.
+      operationId: getPincode
+
+      x-codeSamples:
+        - lang: cURL
+          source: |
+            curl https://bharatapi.dev/api/v1/pincode/421201
+
+        - lang: JavaScript
+          source: |
+            const res = await fetch(
+              "https://bharatapi.dev/api/v1/pincode/421201"
+            );
+
+            const data = await res.json();
+
+            console.log(data);
+
+        - lang: Python
+          source: |
+            import requests
+
+            response = requests.get(
+                "https://bharatapi.dev/api/v1/pincode/421201"
+            )
+
+            print(response.json())
+
+      parameters:
+        - name: code
+          in: path
+          required: true
+          description: Six-digit Indian PIN code.
+          schema:
+            type: string
+            pattern: "^[0-9]{6}$"
+          example: "421201"
+
+      responses:
+        "200":
+          description: Successful lookup.
+          content:
+            application/json:
+              example:
+                success: true
+                meta:
+                  version: v1
+                  requestId: 12345678-abcd-1234-abcd-123456789abc
+                  timestamp: "2026-09-20T13:51:39.847Z"
+                data:
+                  pincode: "421201"
+                  state: MAHARASHTRA
+                  stateLGD: "27"
+                  districtCount: 1
+                  districts:
+                    - district: THANE
+                      districtLGD: "517"
+                      blocks:
+                        - KALYAN
+
+        "400":
+          description: Invalid PIN code.
+          content:
+            application/json:
+              example:
+                success: false
+                meta:
+                  version: v1
+                  requestId: 12345678-abcd-1234-abcd-123456789abc
+                  timestamp: "2026-09-20T13:51:39.847Z"
+                error:
+                  code: INVALID_PINCODE
+                  message: PIN code must contain exactly 6 digits.
+
+        "404":
+          description: PIN code not found.
+          content:
+            application/json:
+              example:
+                success: false
+                meta:
+                  version: v1
+                  requestId: 12345678-abcd-1234-abcd-123456789abc
+                  timestamp: "2026-09-20T13:51:39.847Z"
+                error:
+                  code: PINCODE_NOT_FOUND
+                  message: PIN code 999999 was not found.
