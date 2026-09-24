@@ -1,70 +1,88 @@
 "use client";
 
-import Link from "next/link";
-import { usePathname } from "next/navigation";
-import { MapPin, Code, Play, Book, CircleAlert, Package } from "lucide-react";
-
-import { cn } from "@/lib/utils";
-import { useActiveHeading } from "@/hooks/use-active-heading";
+import { useEffect, useState } from "react";
+import {
+  MapPin,
+  Code2,
+  Play,
+  BookOpen,
+  Package,
+  CircleAlert,
+} from "lucide-react";
+import { cn } from "cn";
 
 const icons = {
   "map-pin": MapPin,
-  code: Code,
+  code: Code2,
   play: Play,
-  book: Book,
-  "circle-alert": CircleAlert,
+  book: BookOpen,
   package: Package,
+  "circle-alert": CircleAlert,
 };
 
-interface DocsSidebarProps {
+interface Section {
+  id: string;
   title: string;
-  sections: {
-    id: string;
-    title: string;
-    icon?: string;
-  }[];
+  icon?: string;
 }
 
-export function DocsSidebar({ title, sections }: DocsSidebarProps) {
-  const pathname = usePathname();
+export function DocsSidebar({
+  title,
+  sections,
+}: {
+  title: string;
+  sections: Section[];
+}) {
+  const [active, setActive] = useState(sections[0]?.id ?? "");
 
-  const active = useActiveHeading(sections.map((section) => section.id));
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        const visible = entries.find((e) => e.isIntersecting);
+        if (visible) setActive(visible.target.id);
+      },
+      {
+        rootMargin: "-20% 0px -65% 0px",
+        threshold: 0.1,
+      },
+    );
+
+    sections.forEach((section) => {
+      const el = document.getElementById(section.id);
+      if (el) observer.observe(el);
+    });
+
+    return () => observer.disconnect();
+  }, [sections]);
 
   return (
-    <aside className="sticky top-28 hidden w-56 shrink-0 lg:block">
-      <div className="text-muted-foreground mb-6 text-xs font-semibold tracking-[0.28em] uppercase">
+    <nav className="space-y-6">
+      <div className="text-xs font-semibold tracking-[0.28em] text-zinc-500 uppercase">
         {title}
       </div>
 
-      <nav className="space-y-1">
+      <div className="space-y-1">
         {sections.map((section) => {
-          const Icon = icons[section.icon as keyof typeof icons] ?? Code;
-
-          const isActive = active === section.id;
+          const Icon = icons[section.icon as keyof typeof icons] ?? MapPin;
 
           return (
-            <Link
+            <a
               key={section.id}
-              href={`${pathname}#${section.id}`}
+              href={`#${section.id}`}
+              onClick={() => setActive(section.id)}
               className={cn(
-                "group flex items-center gap-3 rounded-xl px-3 py-3 text-sm transition-all duration-200",
-                isActive
-                  ? "bg-orange-500 text-white shadow-sm"
-                  : "text-muted-foreground hover:bg-muted/60 hover:text-foreground",
+                "group flex items-center gap-3 rounded-xl px-4 py-3 text-[15px] font-medium transition-all duration-200",
+                active === section.id
+                  ? "bg-orange-50 text-orange-600 dark:bg-orange-500/10 dark:text-orange-400"
+                  : "text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 dark:text-zinc-400 dark:hover:bg-zinc-800 dark:hover:text-zinc-100",
               )}
             >
-              <Icon
-                className={cn(
-                  "size-4 transition-colors duration-200",
-                  isActive ? "text-white" : "group-hover:text-orange-500",
-                )}
-              />
-
-              <span className="font-medium">{section.title}</span>
-            </Link>
+              <Icon className="size-4 shrink-0" />
+              <span>{section.title}</span>
+            </a>
           );
         })}
-      </nav>
-    </aside>
+      </div>
+    </nav>
   );
 }

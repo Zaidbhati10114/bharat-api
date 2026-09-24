@@ -1,14 +1,14 @@
 // Shared configuration for all BharatAPI k6 tests.
 
-export const BASE_URL = __ENV.BASE_URL || "http://localhost:3000";
+export const BASE_URL =
+  __ENV.BASE_URL || "https://bharat-api.zaidbhati007.workers.dev";
 
 export const THRESHOLDS = {
   http_req_failed: ["rate<0.01"],
 
-  // 95% of requests should finish within 1 second.
-  http_req_duration: ["p(95)<1000"],
+  // Cloudflare should easily meet these.
+  http_req_duration: ["p(95)<200", "p(99)<500"],
 
-  // At least 99% of checks should pass.
   checks: ["rate>0.99"],
 };
 
