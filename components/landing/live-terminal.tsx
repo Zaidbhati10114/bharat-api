@@ -22,6 +22,7 @@ export function LiveTerminal() {
 
   const [typed, setTyped] = useState(prefersReducedMotion ? command : "");
   const [typingFinished, setTypingFinished] = useState(prefersReducedMotion);
+  const [showStory, setShowStory] = useState(prefersReducedMotion);
   const [visibleLines, setVisibleLines] = useState(
     prefersReducedMotion ? responseLines.length : 0,
   );
@@ -39,15 +40,22 @@ export function LiveTerminal() {
       if (index >= command.length) {
         clearInterval(typing);
 
-        responseLines.forEach((_, lineIndex) => {
-          setTimeout(() => {
-            setVisibleLines(lineIndex + 1);
+        setTimeout(() => {
+          setShowStory(true);
 
-            if (lineIndex === responseLines.length - 1) {
-              setTypingFinished(true);
-            }
-          }, lineIndex * 120);
-        });
+          responseLines.forEach((_, lineIndex) => {
+            setTimeout(
+              () => {
+                setVisibleLines(lineIndex + 1);
+
+                if (lineIndex === responseLines.length - 1) {
+                  setTypingFinished(true);
+                }
+              },
+              450 + lineIndex * 120,
+            );
+          });
+        }, 250);
       }
     }, 35);
 
@@ -57,6 +65,10 @@ export function LiveTerminal() {
   const copyText = useMemo(
     () =>
       `${command}
+
+# Origin Story
+# 421201 isn't random.
+# It's the PIN code where BharatAPI was born.
 
 ${responseLines.join("\n")}`,
     [],
@@ -129,6 +141,7 @@ ${responseLines.join("\n")}`,
 
         {/* Terminal */}
         <div className="space-y-6 p-7 font-mono text-sm">
+          {/* Command */}
           <div className="break-all text-green-500">
             $ {typed}
             {!prefersReducedMotion && !typingFinished && (
@@ -141,6 +154,33 @@ ${responseLines.join("\n")}`,
             )}
           </div>
 
+          {/* Founder Easter Egg */}
+          <AnimatePresence>
+            {showStory && (
+              <motion.div
+                initial={{ opacity: 0, y: 8 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.35 }}
+                className="rounded-xl border border-orange-500/20 bg-orange-500/5 px-4 py-3"
+              >
+                <div className="mb-2 flex items-center gap-2 text-xs text-orange-400">
+                  <span className="size-2 rounded-full bg-orange-400" />
+                  Origin Story
+                </div>
+
+                <p className="font-sans text-sm leading-6 text-zinc-700 dark:text-zinc-300">
+                  Fun fact:{" "}
+                  <span className="font-mono font-semibold text-orange-500 dark:text-orange-300">
+                    421201
+                  </span>{" "}
+                  isn't random. It's the PIN code where the idea for BharatAPI
+                  was born.
+                </p>
+              </motion.div>
+            )}
+          </AnimatePresence>
+
+          {/* Response */}
           <div className="text-foreground space-y-1">
             <AnimatePresence>
               {responseLines.slice(0, visibleLines).map((line, i) => (

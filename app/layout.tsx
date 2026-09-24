@@ -1,12 +1,19 @@
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
 
 import { ThemeProvider } from "@/components/shared/theme-provider";
-import "./globals.css";
-import { CommandPalette } from "@/components/shared/command-pallete";
 
-const inter = Inter({
+import { CommandPalette } from "@/components/shared/command-pallete";
+import "./globals.css";
+import { Geist, Geist_Mono } from "next/font/google";
+
+const geist = Geist({
   subsets: ["latin"],
+  variable: "--font-sans",
+});
+
+const geistMono = Geist_Mono({
+  subsets: ["latin"],
+  variable: "--font-mono",
 });
 
 export const metadata: Metadata = {
@@ -21,7 +28,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className={inter.className}>
+      <body className={`${geist.variable} ${geistMono.variable} antialiased`}>
         <ThemeProvider>
           {children}
           <CommandPalette />

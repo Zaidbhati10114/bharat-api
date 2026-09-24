@@ -1,3 +1,4 @@
+"use client";
 import { CalendarDays, Car, MapPin } from "lucide-react";
 
 import { Container } from "@/components/shared/container";
@@ -22,21 +23,25 @@ export function FeaturedApis() {
 
         <div className="mt-16 grid gap-6 md:grid-cols-3">
           <ApiCard
-            icon={<MapPin className="size-6" />}
+            icon={MapPin}
             title="Pincode API"
             description="Convert Indian PIN codes into city, district and state instantly."
             endpoint="/v1/pincode/421201"
+            href="/docs/pincode"
+            featured
           />
 
           <ApiCard
-            icon={<CalendarDays className="size-6" />}
+            href="/docs/holidays"
+            icon={CalendarDays}
             title="Holiday API"
             description="National, state and bank holidays for every Indian state."
             endpoint="/v1/holidays/2026"
           />
 
           <ApiCard
-            icon={<Car className="size-6" />}
+            icon={Car}
+            href="/docs/vehicle"
             title="Vehicle Code API"
             description="Find Indian vehicle registration codes and their RTO details."
             endpoint="/v1/vehicle/MH"

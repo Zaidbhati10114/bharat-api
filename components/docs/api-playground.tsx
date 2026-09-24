@@ -14,15 +14,17 @@ import {
   Terminal,
 } from "lucide-react";
 import { AnimatePresence, motion } from "framer-motion";
-import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
-import {
-  oneDark,
-  oneLight,
-} from "react-syntax-highlighter/dist/esm/styles/prism";
-import { useTheme } from "next-themes";
+import { IBM_Plex_Mono } from "next/font/google";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { CodeBlock } from "@/components/shared/code-block";
+import { API_BASE } from "@/lib/api/client";
+
+const plexMono = IBM_Plex_Mono({
+  subsets: ["latin"],
+  weight: ["400", "500", "600"],
+});
 
 interface ApiPlaygroundProps {
   method: "GET";
@@ -40,7 +42,6 @@ export function ApiPlayground({
   validatePattern,
 }: ApiPlaygroundProps) {
   const validator = new RegExp(validatePattern);
-  const { resolvedTheme } = useTheme();
 
   const [value, setValue] = useState(placeholder);
   const [response, setResponse] = useState("");
@@ -53,21 +54,26 @@ export function ApiPlayground({
   const startTimeRef = useRef(0);
 
   const requestPath = endpoint.replace(`{${paramName}}`, value);
+  const requestUrl = `${API_BASE}${requestPath}`;
 
   async function sendRequest() {
     if (!validator.test(value)) return;
 
     setLoading(true);
-    startTimeRef.current = window.performance.now();
+    startTimeRef.current = performance.now();
 
     try {
-      const res = await fetch(requestPath);
-      const json = await res.json();
+      const res = await fetch(requestUrl, {
+        headers: {
+          Accept: "application/json",
+        },
+      });
 
+      const json = await res.json();
       const formatted = JSON.stringify(json, null, 2);
 
       setStatus(res.status);
-      setTime(Math.round(window.performance.now() - startTimeRef.current));
+      setTime(Math.round(performance.now() - startTimeRef.current));
       setSize(new Blob([formatted]).size);
       setResponse(formatted);
     } catch {
@@ -82,9 +88,9 @@ export function ApiPlayground({
       );
 
       setStatus(500);
+      setResponse(formatted);
       setTime(null);
       setSize(new Blob([formatted]).size);
-      setResponse(formatted);
     } finally {
       setLoading(false);
     }
@@ -95,6 +101,7 @@ export function ApiPlayground({
 
     await navigator.clipboard.writeText(response);
     setCopied(true);
+
     setTimeout(() => setCopied(false), 1500);
   }
 
@@ -104,63 +111,70 @@ export function ApiPlayground({
     setStatus(null);
     setTime(null);
     setSize(null);
-    setLoading(false);
-    setCopied(false);
   }
 
   return (
-    <div className="bg-card rounded-2xl border shadow-sm">
-      <div className="space-y-5 p-6">
+    <div className="bg-card rounded-3xl border shadow-sm">
+      <div className="space-y-6 p-8">
         {/* Header */}
-        <div className="space-y-1">
-          <h3 className="text-lg font-semibold">API Explorer</h3>
-          <p className="text-muted-foreground text-sm">
-            Test the live endpoint directly from the documentation.
+
+        <div className="space-y-2">
+          <h3 className="text-3xl font-semibold tracking-tight">
+            API Explorer
+          </h3>
+
+          <p className="text-muted-foreground text-base leading-7">
+            Send real requests to the production Cloudflare endpoint.
           </p>
         </div>
 
-        {/* Unified Input */}
-        <div className="bg-background flex overflow-hidden rounded-xl border">
+        {/* Input */}
+
+        <div className="bg-background flex overflow-hidden rounded-2xl border">
           <Input
             value={value}
             onChange={(e) => setValue(e.target.value)}
             onKeyDown={(e) => e.key === "Enter" && sendRequest()}
             placeholder={placeholder}
-            maxLength={12}
-            className="h-11 border-0 shadow-none focus-visible:ring-0"
+            className="h-14 border-0 text-base shadow-none focus-visible:ring-0"
           />
 
-          <motion.div whileTap={{ scale: 0.97 }}>
-            <Button
-              onClick={sendRequest}
-              disabled={loading || !validator.test(value)}
-              className="h-11 rounded-none rounded-r-xl border-l px-5"
-            >
-              {loading ? (
-                <>
-                  <Loader2 className="mr-2 size-4 animate-spin" />
-                  Sending
-                </>
-              ) : (
-                <>
-                  <Send className="mr-2 size-4" />
-                  Send
-                </>
-              )}
-            </Button>
-          </motion.div>
+          <Button
+            onClick={sendRequest}
+            disabled={loading || !validator.test(value)}
+            className="h-14 rounded-none rounded-r-2xl px-8"
+          >
+            {loading ? (
+              <>
+                <Loader2 className="mr-2 size-4 animate-spin" />
+                Sending
+              </>
+            ) : (
+              <>
+                <Send className="mr-2 size-4" />
+                Send
+              </>
+            )}
+          </Button>
         </div>
 
-        {/* Request Preview */}
-        <div className="bg-muted/30 flex items-center gap-3 rounded-xl border px-4 py-2.5">
-          <span className="rounded bg-green-500/10 px-2 py-1 text-[11px] font-semibold text-green-600">
+        {/* Request URL */}
+
+        <div className="flex items-center gap-3 rounded-2xl border bg-zinc-50 px-4 py-3 dark:bg-zinc-900">
+          <span className="rounded-full bg-green-500/10 px-3 py-1 text-xs font-semibold text-green-600">
             {method}
           </span>
 
-          <code className="text-xs">{requestPath}</code>
+          <div
+            className="text-[15px] break-all text-zinc-800 dark:text-zinc-200"
+            style={{ fontFamily: plexMono.style.fontFamily }}
+          >
+            {requestUrl}
+          </div>
         </div>
 
-        {/* Response Toolbar */}
+        {/* Status */}
+
         <div className="flex flex-wrap items-center justify-between gap-3">
           <AnimatePresence mode="wait">
             <motion.div
@@ -168,12 +182,11 @@ export function ApiPlayground({
               initial={{ opacity: 0, y: -4 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0 }}
-              transition={{ duration: 0.18 }}
-              className="flex flex-wrap items-center gap-2"
+              className="flex flex-wrap gap-2"
             >
               {status !== null && (
                 <span
-                  className={`inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-xs font-medium ${
+                  className={`inline-flex items-center gap-1 rounded-full px-3 py-1 text-xs font-medium ${
                     status < 400
                       ? "bg-green-500/10 text-green-600"
                       : "bg-red-500/10 text-red-600"
@@ -184,19 +197,19 @@ export function ApiPlayground({
                   ) : (
                     <CircleX className="size-3.5" />
                   )}
-                  {status} {status < 400 ? "OK" : "Error"}
+                  {status}
                 </span>
               )}
 
               {time !== null && (
-                <span className="bg-muted inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-xs">
+                <span className="bg-muted inline-flex items-center gap-1 rounded-full px-3 py-1 text-xs">
                   <Clock className="size-3.5" />
                   {time} ms
                 </span>
               )}
 
               {size !== null && (
-                <span className="bg-muted inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-xs">
+                <span className="bg-muted inline-flex items-center gap-1 rounded-full px-3 py-1 text-xs">
                   <Database className="size-3.5" />
                   {size} B
                 </span>
@@ -204,47 +217,33 @@ export function ApiPlayground({
             </motion.div>
           </AnimatePresence>
 
-          <div className="flex items-center gap-2">
-            <motion.div whileHover={{ y: -1 }} whileTap={{ scale: 0.97 }}>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={copyResponse}
-                disabled={!response}
-              >
-                {copied ? (
-                  <>
-                    <Check className="mr-1 size-3.5" />
-                    Copied
-                  </>
-                ) : (
-                  <>
-                    <Copy className="mr-1 size-3.5" />
-                    Copy
-                  </>
-                )}
-              </Button>
-            </motion.div>
+          <div className="flex gap-2">
+            <Button variant="outline" size="sm" onClick={copyResponse}>
+              {copied ? (
+                <>
+                  <Check className="mr-1 size-3.5" />
+                  Copied
+                </>
+              ) : (
+                <>
+                  <Copy className="mr-1 size-3.5" />
+                  Copy
+                </>
+              )}
+            </Button>
 
-            <motion.div whileHover={{ y: -1 }} whileTap={{ scale: 0.97 }}>
-              <Button variant="ghost" size="sm" onClick={resetExplorer}>
-                <RotateCcw className="mr-1 size-3.5" />
-                Reset
-              </Button>
-            </motion.div>
+            <Button variant="ghost" size="sm" onClick={resetExplorer}>
+              <RotateCcw className="mr-1 size-3.5" />
+              Reset
+            </Button>
           </div>
         </div>
 
         {/* Response */}
-        <div className="overflow-hidden rounded-xl border">
-          <div className="bg-muted/30 flex items-center justify-between border-b px-4 py-3">
-            <span className="text-sm font-medium">JSON Response</span>
 
-            {status !== null && (
-              <span className="text-muted-foreground text-xs">
-                {status < 400 ? "Success" : "Error"}
-              </span>
-            )}
+        <div className="overflow-hidden rounded-2xl border">
+          <div className="bg-muted/30 border-b px-5 py-4">
+            <span className="text-base font-semibold">JSON Response</span>
           </div>
 
           <AnimatePresence mode="wait">
@@ -253,8 +252,7 @@ export function ApiPlayground({
                 key="loading"
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                className="bg-zinc-950 p-6 dark:bg-black"
+                className="bg-zinc-950 p-8"
               >
                 <motion.div
                   animate={{ opacity: [0.35, 1, 0.35] }}
@@ -269,61 +267,44 @@ export function ApiPlayground({
                   <div className="h-3 w-full rounded bg-zinc-700" />
                   <div className="h-3 w-5/6 rounded bg-zinc-700" />
                   <div className="h-3 w-2/3 rounded bg-zinc-700" />
-                  <div className="h-3 w-4/5 rounded bg-zinc-700" />
                 </motion.div>
+              </motion.div>
+            ) : response ? (
+              <motion.div
+                key="response"
+                initial={{ opacity: 0, y: 6 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="bg-zinc-950"
+              >
+                <CodeBlock code={response} language="json" lineNumbers />
               </motion.div>
             ) : (
               <motion.div
-                key={response || "empty"}
-                initial={{ opacity: 0, y: 8 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0 }}
-                transition={{ duration: 0.22 }}
-                className="bg-zinc-950 dark:bg-black"
+                key="empty"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                className="bg-zinc-950 px-8 py-14 text-center"
               >
-                {response ? (
-                  <SyntaxHighlighter
-                    language="json"
-                    style={resolvedTheme === "dark" ? oneDark : oneLight}
-                    showLineNumbers
-                    wrapLongLines
-                    customStyle={{
-                      margin: 0,
-                      padding: "24px",
-                      background: "transparent",
-                      fontSize: "13.5px",
-                      lineHeight: "1.8",
-                    }}
-                    codeTagProps={{
-                      style: {
-                        fontFamily:
-                          "ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace",
-                      },
-                    }}
+                <div className="mx-auto mb-5 flex size-14 items-center justify-center rounded-full bg-orange-500/10">
+                  <Terminal className="size-6 text-orange-400" />
+                </div>
+
+                <h4 className="mb-2 text-lg font-semibold text-white">
+                  Response will appear here
+                </h4>
+
+                <p className="mb-6 text-zinc-400">
+                  Enter a valid PIN code and send a request.
+                </p>
+
+                <div className="mx-auto w-full max-w-xl rounded-xl border border-zinc-800 bg-zinc-900 px-4 py-3">
+                  <div
+                    className="overflow-x-auto text-left text-sm text-zinc-200"
+                    style={{ fontFamily: plexMono.style.fontFamily }}
                   >
-                    {response}
-                  </SyntaxHighlighter>
-                ) : (
-                  <div className="flex flex-col items-center justify-center gap-3 px-6 py-14 text-center">
-                    <div className="rounded-full bg-green-500/10 p-3">
-                      <Terminal className="size-5 text-green-500" />
-                    </div>
-
-                    <div className="space-y-1">
-                      <h4 className="text-sm font-medium text-white">
-                        Response will appear here
-                      </h4>
-
-                      <p className="text-sm text-zinc-400">
-                        Enter a valid PIN code and send a request.
-                      </p>
-                    </div>
-
-                    <code className="text-xs text-zinc-500">
-                      GET /api/v1/pincode/421201
-                    </code>
+                    GET {API_BASE}/api/v1/pincode/421201
                   </div>
-                )}
+                </div>
               </motion.div>
             )}
           </AnimatePresence>
